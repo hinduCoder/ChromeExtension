@@ -1,0 +1,28 @@
+<html ng-app="AppModule">
+  <head>
+    <meta charset="utf8">
+    <script type="text/javascript" src="libs/angular.min.js"></script>
+    <script type="text/javascript" src="libs/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body ng-controller="WallController as wall" ng-init="wall.getPosts()">
+    <div class="post" ng-repeat="post in wall.posts" >
+      <!--items-->
+      <item></item>
+      <div ng-controller="CommentsController as commentsController" ng-init="commentsController.getComments(post)">
+        <button class="showComments"></button>
+        <div class="comments"> 
+          <div class="comment" ng-repeat="post in commentsController.comments">
+          <item></item>
+          </div>
+          <div class="form">
+            <textarea class="comment-box" ng-model="commentsController.newCommentText"></textarea>
+            <button class="post-comment-btn" ng-click="commentsController.postComment(post)">Отпр.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+</html>

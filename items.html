@@ -1,0 +1,9 @@
+<div class="user">{{post.name}}</div>
+<img class="avatar" src="{{post.photo_50}}">
+<div class="text" ng-bind-html="post.text | linky | mentionable "></div>
+<div class="attachment" ng-repeat="att in post.attachments">
+	<img class="attachment-photo" ng-show="att.photo" src="{{att.photo.photo_604}}">
+	<a ng-show="att.link" href="{{att.link.url}}">{{att.link.title}}</a>
+	<a ng-show="att.poll" href="http://vk.com/{{$parent.post.owner_id < 0 ? 'club' : 'id'}}{{$parent.post.owner_id}}?w=wall{{$parent.post.owner_id}}_{{$parent.post.id}}">Опрос: {{att.poll.question}}</a>
+</div>
+<div class="date">{{post.date*1000 | date:'H:mm d MMM'}}</div>

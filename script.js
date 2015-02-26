@@ -22,6 +22,9 @@
 	   $('body').on('click', '.form', function(e) {
 	   		e.stopPropagation();
 	   });
+	   $('body').on('click', 'input', function(e) {
+	   		e.stopPropagation();
+	   });
 	});
 
 	chrome.browserAction.setBadgeText({text: ''});
@@ -42,7 +45,6 @@
 			url += "callback=JSON_CALLBACK&v=5.27";
 			console.log(url);
 			$http.jsonp(url).success(function(res) {
-				console.log(res);
 				success(res);
 			}).error(function(data, status, headers, config, statusText)
 				{ 
@@ -61,10 +63,14 @@
 		var addComment = function(ownerId, postId, text, success) {
 			VkApiQuery("wall.addComment", {owner_id:ownerId, post_id: postId, text: text}, localStorage.token, success);
 		};
+		var addVote = function(ownerId, pollId, answerId, success) {
+			VkApiQuery("polls.addVote", {owner_id: ownerId, poll_id: pollId, answer_id: answerId}, localStorage.token, success)
+		};
 		return {
 			getPosts: getPosts,
 			getComments: getComments,
 			addComment: addComment,
+			addVote: addVote,
 			executeProcedure: executeProcedure
 		};
 	}]);
@@ -76,7 +82,7 @@
 			vk.getPosts(10, function(res) {
 				
 	  			wall.posts = res.response;
-	  			var lastPost = wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;
+	  			var lastPost = wall.posts.count == 0 ? null : wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;
 		  		localStorage.lastPost = lastPost.date;
 	  		});
 		};
@@ -96,10 +102,25 @@
 			});
 		};
 	}])
+	.controller('PollController', ['vk', function(vk) {
+		var thePoll = this;
+		this.init = function(poll) {
+			poll.answers.forEach(function(a) {
+				a.selected = false;
+				console.log(a);
+			});
+			thePoll.poll = poll;
+		};
+		this.vote = function(answerId) {
+			vk.addVote(thePoll.poll.owner_id, thePoll.poll.id, answerId, function() {
+				alert('OK');//temp
+			});
+		};
+	}])
 	.directive('item', function() {
 		return {
 			restrict: 'E',
-			templateUrl: 'items.html',
+			templateUrl: 'item.html',
 		};
 	})
 	.filter('mentionable', function() {
@@ -108,12 +129,10 @@
 			if (!regex.test(s)) return s;
 			return s.replace(regex, function(match) {
 				var subs = match.slice(1, match.length-1).split('|');
-				console.log(subs);
 				var result = '<a href="http://vk.com/' + subs[0] + '">'+  subs[1] +'</a>';
-				console.log(result);
 				return result;
 			});
 		}
 	});
-})();
+}) ();
 

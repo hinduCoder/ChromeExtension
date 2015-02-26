@@ -40,6 +40,12 @@ body {
   margin-bottom: 5px;
   display: block;
 }
+.post .attachment .poll {
+  margin: 5px;
+  margin-left: 55px;
+  padding-left: 5px;
+  border-left: 5px solid #2b587a;
+}
 .showComments {
   width: 100%;
   color: #2b587a;
@@ -88,6 +94,7 @@ body {
   width: 85%;
   border: 1px solid #2b587a;
   resize: none;
+  font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
 }
 .comments .post-comment-btn {
   background: #2b587a;

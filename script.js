@@ -83,7 +83,10 @@
 				
 	  			wall.posts = res.response;
 	  			var lastPost = wall.posts.count == 0 ? null : wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;
-		  		localStorage.lastPost = lastPost.date;
+	  			if (lastPost.date)
+		  			localStorage.lastPost = lastPost.date;
+		  		else
+		  			console.log("foreground: ", lastPost.date)
 	  		});
 		};
 	}])

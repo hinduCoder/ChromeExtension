@@ -43,7 +43,10 @@ function update() {
 	   		+ posts[i].owner_id.toString() + "_" + posts[i].id.toString()});
 					});
 				}
-				localStorage.lastPost = posts[0].date;
+				if (posts[0].date)
+					localStorage.lastPost = posts[0].date;
+				else
+					console.log("background: ", posts[0])
 			},
 			error: function(er) {
 				console.log(er);

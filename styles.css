@@ -60,10 +60,10 @@ body {
 .showComments:focus {
   outline: 0;
 }
-.showComments:after {
+.showComments:before {
   content: 'Показать комментарии';
 }
-.showComments.opened:after {
+.showComments.opened:before {
   content: 'Скрыть комментарии';
 }
 .showComments.opened + .comments {

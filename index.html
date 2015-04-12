@@ -12,7 +12,7 @@
       <!--items-->
       <item></item>
       <div ng-controller="CommentsController as commentsController" ng-init="commentsController.getComments(post)">
-        <button class="showComments"></button>
+        <button class="showComments">({{commentsController.comments.length}}) </button>
         <div class="comments"> 
           <div class="comment" ng-repeat="post in commentsController.comments">
           <item></item>

@@ -82,12 +82,13 @@ chrome.runtime.onInstalled.addListener(function () {
 					localStorage.token = getUrlParameterValue(change.url, "access_token"); //TODO after first time do not save
 					if (localStorage.token != null && localStorage.token.length > 0)
 					chrome.tabs.onUpdated.removeListener(updateListener);
+					chrome.tabs.remove(tabId);
 				}
 			}
 			chrome.tabs.onUpdated.addListener(updateListener);
 		});
 	}
-	if (localStorage.domain == null) localStorage.domain = 'itd72';
+	if (localStorage.domain == null) localStorage.domain = 'itd82';
 	localStorage.lastPost = Math.trunc(Date.now()/1000);
 });
 chrome.alarms.onAlarm.addListener(function(alarm) {

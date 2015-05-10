@@ -12,6 +12,29 @@
 			<laber class="answer" for="{{post.id}}-{{$index}}">{{answer.text}}</laber>
 		</div>
 	</div>
+
 	<!-- <a ng-show="att.poll" href="http://vk.com/{{$parent.post.owner_id < 0 ? 'club' : 'id'}}{{$parent.post.owner_id}}?w=wall{{$parent.post.owner_id}}_{{$parent.post.id}}">Опрос: {{att.poll.question}}</a> -->
 </div>
+<div class="respost-posts" ng-show="post.copy_history">
+	<div class="repost" ng-repeat="post in post.copy_history">
+		<div class="user">{{post.name}}</div>
+		<img class="avatar" src="{{post.photo_50}}">
+		<div class="text" ng-bind-html="post.text | linky | mentionable "></div>
+		<div class="attachment" ng-repeat="att in post.attachments">
+			<img class="attachment-photo" ng-show="att.photo" src="{{att.photo.photo_604}}">
+			<a ng-show="att.link" href="{{att.link.url}}">{{att.link.title}}</a>
+			<a ng-show="att.doc" href="{{att.doc.url}}">{{att.doc.title}}</a>
+			<div class="poll" ng-show="att.poll" ng-controller="PollController as pollCtrl" ng-init="pollCtrl.init(att.poll)">
+				<div class="question">{{pollCtrl.poll.question}}</div>
+				<div class="answers" ng-repeat="answer in pollCtrl.poll.answers">
+					<input type="radio" name="{{post.id}}" id="{{post.id}}-{{$index}}" ng-model="answer.selected" ng-change="pollCtrl.vote(answer.id)">
+					<laber class="answer" for="{{post.id}}-{{$index}}">{{answer.text}}</laber>
+				</div>
+			</div>
+
+			<!-- <a ng-show="att.poll" href="http://vk.com/{{$parent.post.owner_id < 0 ? 'club' : 'id'}}{{$parent.post.owner_id}}?w=wall{{$parent.post.owner_id}}_{{$parent.post.id}}">Опрос: {{att.poll.question}}</a> -->
+		</div>
+		<div class="date">{{post.date*1000 | date:'H:mm d MMM'}}</div>
+		</div>
+	</div>
 <div class="date">{{post.date*1000 | date:'H:mm d MMM'}}</div>

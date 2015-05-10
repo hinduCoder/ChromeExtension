@@ -1,1 +1,1 @@
-lessc style.less styles.css
+%USERPROFILE%\AppData\Roaming\npm\lessc style.less styles.css

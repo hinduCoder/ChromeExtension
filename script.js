@@ -95,9 +95,8 @@
 			vk.getPosts(10, function(res) {
 				console.log(res);
 	  			wall.posts = res.response.items;
-	  			for (var i = 0; i < wall.posts.length; i++) {
-	  				var post = wall.posts[i];
-	  				if (post.from_id > 0) {
+	  			var addInfo = function(post) {
+					if (post.from_id > 0) {
 	  					var profile = res.response.profiles.filter(function(i) { return i.id == post.from_id; })[0];
 	  					post.name = profile.first_name + ' ' + profile.last_name;
 	  					post.photo_50 = profile.photo_50;
@@ -106,6 +105,15 @@
 	  					post.name = group.name;
 	  					post.photo_50 = group.photo_50;
 	  				}
+	  			};
+	  			for (var i = 0; i < wall.posts.length; i++) {
+	  				var post = wall.posts[i];
+	  				addInfo(post);
+	  				if (post.copy_history)
+	  				for (var j = 0; j < post.copy_history.length; j++) {
+	  					var repost = post.copy_history[j];
+	  					addInfo(repost);
+	  				};
 	  			}
 	  			console.log(wall.posts);
 	  			var lastPost = res.response.count == 0 ? null : wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;

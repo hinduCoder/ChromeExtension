@@ -55,7 +55,20 @@
 			VkApiQuery("execute."+proc, params, localStorage.token, success)
 		};
 		var getPosts = function(count, success) {
-			executeProcedure('getPosts', { domain: localStorage.domain, count: count}, success);
+			VkApiQuery('wall.get', { domain: localStorage.domain, count: count, extended: 1} , localStorage.token, success
+			// 	function(data) {
+			// 	var posts = data.response.items;
+			// 	console.log(data);
+			// 	for (var i = 0; i < posts.length; i++) {
+			// 		executeProcedure('addInfo', {post_id: posts[i].owner_id+'_'+posts[i].id}, function(data) {
+			// 			console.log(data);
+			// 			posts[i] = data;
+			// 		});
+			// 	};
+			// 	success(posts);
+			// }
+			);
+			//executeProcedure('getPosts', { domain: localStorage.domain, count: count}, success);
 		};
 		var getComments = function(ownerId, postId, success) {
 			executeProcedure('getComments', { owner_id: ownerId, post_id: postId, count: 50}, success);
@@ -80,9 +93,22 @@
 		var wall = this;
 		this.getPosts = function() {
 			vk.getPosts(10, function(res) {
-				
-	  			wall.posts = res.response;
-	  			var lastPost = wall.posts.count == 0 ? null : wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;
+				console.log(res);
+	  			wall.posts = res.response.items;
+	  			for (var i = 0; i < wall.posts.length; i++) {
+	  				var post = wall.posts[i];
+	  				if (post.from_id > 0) {
+	  					var profile = res.response.profiles.filter(function(i) { return i.id == post.from_id; })[0];
+	  					post.name = profile.first_name + ' ' + profile.last_name;
+	  					post.photo_50 = profile.photo_50;
+	  				} else {
+	  					var group = res.response.groups.filter(function(i) { return i.id == -post.from_id; })[0];
+	  					post.name = group.name;
+	  					post.photo_50 = group.photo_50;
+	  				}
+	  			}
+	  			console.log(wall.posts);
+	  			var lastPost = res.response.count == 0 ? null : wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;
 	  			if (lastPost.date)
 		  			localStorage.lastPost = lastPost.date;
 		  		else
@@ -108,9 +134,9 @@
 	.controller('PollController', ['vk', function(vk) {
 		var thePoll = this;
 		this.init = function(poll) {
+			if (poll) //он достал
 			poll.answers.forEach(function(a) {
 				a.selected = false;
-				console.log(a);
 			});
 			thePoll.poll = poll;
 		};

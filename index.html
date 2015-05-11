@@ -11,8 +11,8 @@
     <div class="post" ng-repeat="post in wall.posts" >
       <!--items-->
       <item></item>
-      <div ng-controller="CommentsController as commentsController" ng-init="commentsController.getComments(post)">
-        <button class="showComments">({{commentsController.comments.length}}) </button>
+      <div ng-controller="CommentsController as commentsController" ng-init="">
+        <button ng-click="commentsController.getComments(post)" class="showComments">({{post.comments.count}}) </button>
         <div class="comments"> 
           <div class="comment" ng-repeat="post in commentsController.comments">
           <item></item>

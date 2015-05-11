@@ -55,20 +55,7 @@
 			VkApiQuery("execute."+proc, params, localStorage.token, success)
 		};
 		var getPosts = function(count, success) {
-			VkApiQuery('wall.get', { domain: localStorage.domain, count: count, extended: 1} , localStorage.token, success
-			// 	function(data) {
-			// 	var posts = data.response.items;
-			// 	console.log(data);
-			// 	for (var i = 0; i < posts.length; i++) {
-			// 		executeProcedure('addInfo', {post_id: posts[i].owner_id+'_'+posts[i].id}, function(data) {
-			// 			console.log(data);
-			// 			posts[i] = data;
-			// 		});
-			// 	};
-			// 	success(posts);
-			// }
-			);
-			//executeProcedure('getPosts', { domain: localStorage.domain, count: count}, success);
+			VkApiQuery('wall.get', { domain: localStorage.domain, count: count, extended: 1} , localStorage.token, success);
 		};
 		var getComments = function(ownerId, postId, success) {
 			executeProcedure('getComments', { owner_id: ownerId, post_id: postId, count: 50}, success);
@@ -93,7 +80,6 @@
 		var wall = this;
 		this.getPosts = function() {
 			vk.getPosts(10, function(res) {
-				console.log(res);
 	  			wall.posts = res.response.items;
 	  			var addInfo = function(post) {
 					if (post.from_id > 0) {
@@ -115,12 +101,11 @@
 	  					addInfo(repost);
 	  				};
 	  			}
-	  			console.log(wall.posts);
 	  			var lastPost = res.response.count == 0 ? null : wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;
-	  			if (lastPost.date)
-		  			localStorage.lastPost = lastPost.date;
+	  			if (lastPost)
+		  			localStorage.lastPost = lastPost;
 		  		else
-		  			console.log("foreground: ", lastPost.date)
+		  			console.log("foreground: ", lastPost)
 	  		});
 		};
 	}])
@@ -130,6 +115,11 @@
 		this.getComments = function(post) {
 			vk.getComments(post.owner_id, post.id, function(res) {
 				controller.comments = res.response;
+				console.log(res);
+				if (res.response == null)
+					setInterval(function() {
+						controller.comments = res.response;
+					},100);	
 			});
 		};
 		this.postComment = function(post) {

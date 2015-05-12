@@ -14,7 +14,7 @@
   },
    
   "content_security_policy": "script-src 'self' https://api.vk.com; object-src 'self'",
-  "permissions": ["tabs", "alarms", "notifications", "tabs", "storage", "http://*/*", "https://*/*"],
+  "permissions": ["tabs", "alarms", "notifications", "storage", "http://*/*", "https://*/*"],
   "background": {
   	"scripts": ["background.js", "libs/jquery.js"]
   },

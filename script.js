@@ -25,7 +25,16 @@
 	   $('body').on('click', 'input', function(e) {
 	   		e.stopPropagation();
 	   });
+	   $(document).on('scroll', function() {
+	   		var scrollPercentage = 100 * $(document).scrollTop() / ($(document).height() - 600);
+	   		if (scrollPercentage > 99) { //TODO избавиться от повторных запросов, ибо запросы надо минимизировать, ну ты понял
+	   			console.log(scrollPercentage);
+	   			var wallController = angular.element($('body')).controller();
+	   			wallController.getPosts(wallController.posts.length);
+	   		}
+	   })
 	});
+
 
 	chrome.browserAction.setBadgeText({text: ''});
 	angular.module('VkModule', [])
@@ -54,8 +63,8 @@
 		var executeProcedure = function(proc, params, success) {
 			VkApiQuery("execute."+proc, params, localStorage.token, success)
 		};
-		var getPosts = function(count, success) {
-			VkApiQuery('wall.get', { domain: localStorage.domain, count: count, extended: 1} , localStorage.token, success);
+		var getPosts = function(count, offset, success) {
+			VkApiQuery('wall.get', { domain: localStorage.domain, offset: offset, count: count, extended: 1} , localStorage.token, success);
 		};
 		var getComments = function(ownerId, postId, success) {
 			executeProcedure('getComments', { owner_id: ownerId, post_id: postId, count: 50}, success);
@@ -78,9 +87,18 @@
 	angular.module('AppModule', ['ngSanitize', 'VkModule'])
 	.controller('WallController', ['vk', function(vk) {
 		var wall = this;
-		this.getPosts = function() {
-			vk.getPosts(10, function(res) {
-	  			wall.posts = res.response.items;
+		this.getPosts = function(_offset) {
+			var offset = _offset || 0;
+
+			vk.getPosts(10, offset, function(res) {
+				if (wall.posts && wall.posts.length > offset)
+					return;
+				//console.log(offset);
+				if (wall.posts)
+					wall.posts = wall.posts.concat(res.response.items);
+				else
+					wall.posts = res.response.items;
+	  			
 	  			var addInfo = function(post) {
 					if (post.from_id > 0) {
 	  					var profile = res.response.profiles.filter(function(i) { return i.id == post.from_id; })[0];
@@ -92,7 +110,7 @@
 	  					post.photo_50 = group.photo_50;
 	  				}
 	  			};
-	  			for (var i = 0; i < wall.posts.length; i++) {
+	  			for (var i = offset; i < wall.posts.length; i++) {
 	  				var post = wall.posts[i];
 	  				addInfo(post);
 	  				if (post.copy_history)

@@ -101,7 +101,7 @@
 	  					addInfo(repost);
 	  				};
 	  			}
-	  			var lastPost = res.response.count == 0 ? null : wall.posts[0].isPinned == 1 ? wall.posts[1].date : wall.posts[0].date;
+	  			var lastPost = res.response.count == 0 ? null : wall.posts[0].is_pinned ? wall.posts[1].date : wall.posts[0].date;
 	  			if (lastPost)
 		  			localStorage.lastPost = lastPost;
 		  		else

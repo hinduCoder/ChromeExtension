@@ -75,18 +75,41 @@
 		var addVote = function(ownerId, pollId, answerId, success) {
 			VkApiQuery("polls.addVote", {owner_id: ownerId, poll_id: pollId, answer_id: answerId}, localStorage.token, success)
 		};
+		var post = function(text, success) {
+			executeProcedure("post", {domain: localStorage.domain, message: text}, success)
+		}
 		return {
 			getPosts: getPosts,
 			getComments: getComments,
 			addComment: addComment,
 			addVote: addVote,
+			post: post,
 			executeProcedure: executeProcedure
 		};
 	}]);
 
 	angular.module('AppModule', ['ngSanitize', 'VkModule'])
 	.controller('WallController', ['vk', function(vk) {
+		this.newPostText = ""
 		var wall = this;
+		
+		this.post = function() {
+			vk.post(wall.newPostText, function () {
+				vk.getPosts(1, 0, function(data) {
+					var post = data.response.items[0];
+					if (post.from_id > 0) {
+						var profile = data.response.profiles[0];
+						post.name = profile.first_name + ' ' + profile.last_name;
+						post.photo_50 = profile.photo_50;
+					} else {
+						var group = data.response.groups[0];
+						post.name = group.name;
+						post.photo_50 = group.photo_50;
+					}
+					wall.posts.unshift(post);
+				});
+			});
+		};
 		this.getPosts = function(_offset) {
 			var offset = _offset || 0;
 
@@ -98,18 +121,18 @@
 					wall.posts = wall.posts.concat(res.response.items);
 				else
 					wall.posts = res.response.items;
-	  			
-	  			var addInfo = function(post) {
+	  			addInfo = function(post) {
 					if (post.from_id > 0) {
-	  					var profile = res.response.profiles.filter(function(i) { return i.id == post.from_id; })[0];
-	  					post.name = profile.first_name + ' ' + profile.last_name;
-	  					post.photo_50 = profile.photo_50;
-	  				} else {
-	  					var group = res.response.groups.filter(function(i) { return i.id == -post.from_id; })[0];
-	  					post.name = group.name;
-	  					post.photo_50 = group.photo_50;
-	  				}
-	  			};
+						var profile = res.response.profiles.filter(function(i) { return i.id == post.from_id; })[0];
+						post.name = profile.first_name + ' ' + profile.last_name;
+						post.photo_50 = profile.photo_50;
+					} else {
+						var group = res.response.groups.filter(function(i) { return i.id == -post.from_id; })[0];
+						post.name = group.name;
+						post.photo_50 = group.photo_50;
+					}
+				};
+	  			
 	  			for (var i = offset; i < wall.posts.length; i++) {
 	  				var post = wall.posts[i];
 	  				addInfo(post);
@@ -122,8 +145,6 @@
 	  			var lastPost = res.response.count == 0 ? null : wall.posts[0].is_pinned ? wall.posts[1].date : wall.posts[0].date;
 	  			if (lastPost)
 		  			localStorage.lastPost = lastPost;
-		  		else
-		  			console.log("foreground: ", lastPost)
 	  		});
 		};
 	}])

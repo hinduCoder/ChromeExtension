@@ -95,14 +95,14 @@ body {
   clear: both;
   display: block;
 }
-.comments .comment-box {
+.comment-box {
   margin: 5px;
   width: 85%;
   border: 1px solid #2b587a;
   resize: none;
   font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
 }
-.comments .post-comment-btn {
+.post-comment-btn {
   background: #2b587a;
   color: white;
   border-radius: 3px;

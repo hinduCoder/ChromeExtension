@@ -8,6 +8,10 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
   </head>
   <body ng-controller="WallController as wall" ng-init="wall.getPosts()">
+    <div class="form">
+      <textarea class="comment-box" ng-model="wall.newPostText"></textarea>
+      <button class="post-comment-btn" ng-click="wall.post()">Отпр.</button>
+    </div>
     <div class="post" ng-repeat="post in wall.posts" >
       <!--items-->
       <item></item>

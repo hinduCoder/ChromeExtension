@@ -1,16 +1,20 @@
 {
  
   "manifest_version": 2,
-  "name": "ITD-82",
+  "name": "Group Viewer",
   "version": "1.0.0",
   "icons" : {
-    "48": "icon.jpg",
-    "128": "icon.jpg"
+    "16": "images/vk16.png",
+    "48": "images/vk48.png",
+    "128": "images/vk128.png"
   },
 
   "browser_action": {
     "default_popup": "index.html",
-    "default_icon": "icon.jpg"
+    "default_icon": {
+        "19": "images/vk20.png",
+        "38": "images/vk48.png"
+    }
   },
    
   "content_security_policy": "script-src 'self' https://api.vk.com; object-src 'self'",

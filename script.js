@@ -3,6 +3,7 @@
 		angular.element($('body')).scope().ctrl.getPosts(message);
 	});
 
+    
 	$(document).ready(function(){
 	   $('body').on('click', 'a', function(e){
 	     chrome.tabs.create({url: $(this).attr('href')});
@@ -28,7 +29,6 @@
 	   $(document).on('scroll', function() {
 	   		var scrollPercentage = 100 * $(document).scrollTop() / ($(document).height() - 600);
 	   		if (scrollPercentage > 99) { //TODO избавиться от повторных запросов, ибо запросы надо минимизировать, ну ты понял
-	   			console.log(scrollPercentage);
 	   			var wallController = angular.element($('body')).controller();
 	   			wallController.getPosts(wallController.posts.length);
 	   		}
@@ -39,7 +39,7 @@
 	chrome.browserAction.setBadgeText({text: ''});
 	angular.module('VkModule', [])
 	.factory('vk', ['$http', function($http) {
-		var VkApiQuery = function (method, params, token, success)
+		var VkApiQuery = function (method, params, success)
 		{
 			var url = "https://api.vk.com/method/"+method +"?";
 			if (typeof params == "string")
@@ -49,8 +49,8 @@
 					url += p + "=" + params[p] +"&";
 				}
 			}
-			if (token)
-				url += "access_token="+token+"&";
+//			if (localStorage.token)
+				url += "access_token="+localStorage.token+"&";
 			url += "callback=JSON_CALLBACK&v=5.27";
 			console.log(url);
 			$http.jsonp(url).success(function(res) {
@@ -61,19 +61,19 @@
 				});
 		};
 		var executeProcedure = function(proc, params, success) {
-			VkApiQuery("execute."+proc, params, localStorage.token, success)
+			VkApiQuery("execute."+proc, params, success)
 		};
 		var getPosts = function(count, offset, success) {
-			VkApiQuery('wall.get', { domain: localStorage.domain, offset: offset, count: count, extended: 1} , localStorage.token, success);
+			VkApiQuery('wall.get', { domain: localStorage.domain, offset: offset, count: count, extended: 1}, success);
 		};
 		var getComments = function(ownerId, postId, success) {
 			executeProcedure('getComments', { owner_id: ownerId, post_id: postId, count: 50}, success);
 		};
 		var addComment = function(ownerId, postId, text, success) {
-			VkApiQuery("wall.addComment", {owner_id:ownerId, post_id: postId, text: text}, localStorage.token, success);
+			VkApiQuery("wall.addComment", {owner_id:ownerId, post_id: postId, text: text}, success);
 		};
 		var addVote = function(ownerId, pollId, answerId, success) {
-			VkApiQuery("polls.addVote", {owner_id: ownerId, poll_id: pollId, answer_id: answerId}, localStorage.token, success)
+			VkApiQuery("polls.addVote", {owner_id: ownerId, poll_id: pollId, answer_id: answerId}, success)
 		};
 		var post = function(text, success) {
 			executeProcedure("post", {domain: localStorage.domain, message: text}, success)

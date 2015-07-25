@@ -12,7 +12,7 @@
 	   });
 	   $("body").on('click', '.post', function() {
 	   		var post = angular.element($(this)).scope().post;
-	   		var url = "http://vk.com/" + (post.owner_id < 0 ? 'club' : 'id') + Math.abs(post.owner_id).toString() + "?w=wall" 
+	   		var url = "http://vk.com/" + localStorage.domain + "?w=wall" 
 	   		+ post.owner_id.toString() + "_" + post.id.toString();
 	   		chrome.tabs.create({url: url});
 	   });
@@ -49,9 +49,8 @@
 					url += p + "=" + params[p] +"&";
 				}
 			}
-//			if (localStorage.token)
-				url += "access_token="+localStorage.token+"&";
-			url += "callback=JSON_CALLBACK&v=5.27";
+
+            url += "access_token="+localStorage.token+"&callback=JSON_CALLBACK&v=5.27";
 			console.log(url);
 			$http.jsonp(url).success(function(res) {
 				success(res);
@@ -107,6 +106,7 @@
 						post.photo_50 = group.photo_50;
 					}
 					wall.posts.unshift(post);
+                    localStorage.lastPost = Math.trunc(Date.now()/1000);
 				});
 			});
 		};

@@ -6,6 +6,13 @@ function decreaseBadge() {
 		chrome.browserAction.setBadgeText({text: count == 0 ? '' : count.toString()});
 	});
 }
+function increaseBadge(n) {
+    chrome.browserAction.getBadgeText({}, function(result) {
+        var badge = parseInt(result || 0);
+        badge += n || 1;
+        chrome.browserAction.setBadgeText({text: badge.toString()});
+    });
+}   
 chrome.notifications.onClicked.addListener(function (notificationId) {
 	var entry = notificationLinks.filter(function(e) { return e.id == notificationId })[0];
 	if (entry == null) return;
@@ -14,6 +21,7 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
 	if (index > -1)
 		notificationLinks.splice(index, 1);
 	decreaseBadge();
+    chrome.notifications.clear(notificationId);
 });
 chrome.notifications.onClosed.addListener(function (id) {
 	var entry = notificationLinks.filter(function(e) { return e.id == notificationId })[0];
@@ -23,14 +31,20 @@ chrome.notifications.onClosed.addListener(function (id) {
 });
 function update() {
 	if (localStorage.token == null) return;
-	$.ajax("https://api.vk.com/method/execute.getNewPosts?v=5.28&callback=JSON_CALLBACK&domain=" + localStorage.domain + "&last_time=" + localStorage.lastPost + "&access_token="+localStorage.token,
+	$.ajax("https://api.vk.com/method/execute.getNewPosts",
 	
 		{
+            data: {
+                domain: localStorage.domain,
+                last_time: localStorage.lastPost,
+                access_token: localStorage.token,
+                v: 5.28
+            },
 			dataType: "jsonp",
 			success: function(data) {
 				var posts = data.response;
 				if (posts.length == 0) return;
-				chrome.browserAction.setBadgeText({text: posts.length.toString()});
+				increaseBadge(posts.length);
 				for (var i in posts) {
 					chrome.notifications.create("", 
 					{
@@ -39,7 +53,7 @@ function update() {
 						title: posts[i].name, 
 						message: posts[i].text
 					}, function(id){
-						notificationLinks.push({ id: id, link: "http://vk.com/" + (posts[i].owner_id < 0 ? 'club' : 'id') + Math.abs(posts[i].owner_id).toString() + "?w=wall" 
+						notificationLinks.push({ id: id, link: "http://vk.com/" + localStorage.domain + "?w=wall" 
 	   		+ posts[i].owner_id.toString() + "_" + posts[i].id.toString()});
 					});
 				}
@@ -94,7 +108,7 @@ chrome.runtime.onInstalled.addListener(function () {
 chrome.alarms.onAlarm.addListener(function(alarm) {
 	update();
 });
-chrome.alarms.create("alarm1", {periodInMinutes: 15});
+chrome.alarms.create("alarm1", {periodInMinutes: 1});
 chrome.storage.onChanged.addListener(function(changes) {
 	localStorage.domain = changes.domain.newValue;
 	localStorage.lastPost = Math.trunc(Date.now()/1000);

@@ -46,9 +46,17 @@ function update() {
 				if (posts.length == 0) return;
 				increaseBadge(posts.length);
 				for (var i in posts) {
+                    var img = null
+                    var attachmets = posts[i].attachments;
+                    var attachmentsPhoto = null;
+                    if (attachmets)
+                        attachmentsPhoto = attachmets.filter(function(a) {return a.type.endsWith('photo')});
+                    if (attachmentsPhoto)
+                        img = attachmentsPhoto[0].photo.photo_604;
 					chrome.notifications.create("", 
 					{
-						type: "basic", 
+						type: img ? 'image' : 'basic',
+                        imageUrl: img,
 						iconUrl: posts[i].photo_100, 
 						title: posts[i].name, 
 						message: posts[i].text
@@ -59,8 +67,6 @@ function update() {
 				}
 				if (posts[0].date)
 					localStorage.lastPost = posts[0].date;
-				else
-					console.log("background: ", posts[0])
 			},
 			error: function(er) {
 				console.log(er);
@@ -108,7 +114,7 @@ chrome.runtime.onInstalled.addListener(function () {
 chrome.alarms.onAlarm.addListener(function(alarm) {
 	update();
 });
-chrome.alarms.create("alarm1", {periodInMinutes: 1});
+chrome.alarms.create("alarm1", {periodInMinutes: 10});
 chrome.storage.onChanged.addListener(function(changes) {
 	localStorage.domain = changes.domain.newValue;
 	localStorage.lastPost = Math.trunc(Date.now()/1000);
